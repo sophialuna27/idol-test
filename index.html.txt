@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✨ 4~5세대 아이돌 내 최애 찾기 테스트</title>
+    
+    <!-- SNS 오픈그래프(OG) 바이럴 태그 -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="✨ 4~5세대 아이돌 내 최애 찾기 테스트">
+    <meta property="og:description" content="남돌/여돌 취향 분석! 나와 운명처럼 딱 맞아떨어지는 4~5세대 최애는 누구?">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630.png?text=Idol+Test">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <style>
+        :root {
+            --primary: #7c4dff;
+            --primary-hover: #651fff;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #212529;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .container { background: var(--card-bg); width: 100%; max-width: 480px; padding: 32px 24px; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); text-align: center; }
+        h1 { font-size: 1.5rem; margin-bottom: 12px; word-break: keep-all; }
+        p { color: #6c757d; font-size: 0.95rem; margin-bottom: 24px; line-height: 1.5; }
+        
+        .btn-group { display: flex; flex-direction: column; gap: 12px; }
+        button { background: var(--primary); color: white; border: none; padding: 16px; border-radius: 14px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
+        button:hover { background: var(--primary-hover); transform: translateY(-2px); }
+        button.secondary { background: #e9ecef; color: #495057; }
+        button.secondary:hover { background: #dee2e6; }
+        
+        .progress-bar { width: 100%; background: #e9ecef; height: 8px; border-radius: 4px; margin-bottom: 24px; overflow: hidden; }
+        .progress { background: var(--primary); height: 100%; width: 0%; transition: width 0.3s ease; }
+
+        .hidden { display: none; }
+        
+        /* 결과 카드 스타일 (인스타 스토리 캡처 용이) */
+        .result-card { background: linear-gradient(135deg, #f3e5f5, #e8eaf6); padding: 24px; border-radius: 18px; margin: 20px 0; border: 2px solid #d1c4e9; }
+        .result-badge { display: inline-block; background: var(--primary); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; margin-bottom: 8px; }
+        .result-title { font-size: 1.6rem; color: #311b92; margin-bottom: 8px; font-weight: 700; }
+        .result-desc { color: #4a148c; font-size: 0.95rem; line-height: 1.6; text-align: left; background: rgba(255,255,255,0.7); padding: 14px; border-radius: 12px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 1. 성별 선택 메인 화면 -->
+    <div id="screen-start">
+        <span style="font-size: 3rem;">✨</span>
+        <h1 style="margin-top: 10px;">내 운명의 4~5세대<br>최애 찾기 테스트</h1>
+        <p>몇 가지 간단한 취향 선택으로<br>나와 찰떡인 최애를 추천해드립니다!</p>
+        <div class="btn-group">
+            <button onclick="selectCategory('female')">🚺 여자 아이돌 최애 찾기</button>
+            <button onclick="selectCategory('male')">🚹 남자 아이돌 최애 찾기</button>
+        </div>
+    </div>
+
+    <!-- 2. 질문 화면 -->
+    <div id="screen-quiz" class="hidden">
+        <div class="progress-bar"><div id="progress" class="progress"></div></div>
+        <h1 id="question-text">질문이 여기에 표시됩니다.</h1>
+        <p id="question-sub">취향에 맞는 선택지를 클릭해 주세요.</p>
+        <div id="answers" class="btn-group"></div>
+    </div>
+
+    <!-- 3. 결과 화면 -->
+    <div id="screen-result" class="hidden">
+        <span>🎉</span>
+        <h1>당신의 찰떡 최애는?</h1>
+        <div class="result-card">
+            <span id="res-badge" class="result-badge">세대 / 그룹</span>
+            <div id="res-name" class="result-title">아이돌 이름</div>
+            <div id="res-desc" class="result-desc">아이돌 설명 및 입덕 포인트</div>
+        </div>
+        <div class="btn-group">
+            <button onclick="copyLink()">🔗 테스트 링크 복사해서 공유하기</button>
+            <button class="secondary" onclick="resetTest()">🔄 다시 테스트하기</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 4~5세대 아이돌 결과 데이터
+    const idolData = {
+        female: [
+            { name: "카리나 (에스파)", tag: "4세대 · 에스파", desc: "시크하고 차가워 보이는 독보적 비주얼 속 따뜻하고 다정한 반전 갭모에! 무대 위 압도적인 아우라를 선호하는 당신과 찰떡궁합." },
+            { name: "원희 (아일릿)", tag: "5세대 · 아일릿", desc: "보기만 해도 웃음이 나오는 동글동글 풋풋한 멍뭉미! 존재 자체로 힐링을 주는 귀여운 스타일을 좋아하는 당신의 운명." },
+            { name: "장원영 (아이브)", tag: "4세대 · 아이브", desc: "타고난 아이돌력과 단단한 내면, 완성형 패션 감각! 보고만 있어도 자기계발 욕구가 솟구치는 갓생 최애 타입." }
+        ],
+        male: [
+            { name: "태산 (보이넥스트도어)", tag: "5세대 · 보이넥스트도어", desc: "힙하고 독보적인 음색, 올라운더 음악적 센스에 무심한 듯 다정한 냥냥이 모먼트! 감성적인 사복과 힙한 틴에이저 느낌을 좋아하는 당신에게 딱." },
+            { name: "원빈 (라이즈)", tag: "5세대 · 라이즈", desc: "정석적인 조각 비주얼에 묵직한 중저음 음색과 분위기! 아티틱한 매력과 무대 직캠 갭모에에 단숨에 빠져들 타입." },
+            { name: "연준 (투모로우바이투게더)", tag: "4세대 · TXT", desc: "트렌디한 사복 센스와 압도적인 무대 퍼포먼스! 핫하고 에너지 넘치는 스타일을 좋아하는 당신의 완벽한 픽." }
+        ]
+    };
+
+    // 공통 취향 질문 목록
+    const questions = [
+        {
+            q: "내가 즐겨 듣는 음악 및 무대 스타일은?",
+            options: [
+                { text: "힙하고 청량한 틴에이저/감성 팝", score: 0 },
+                { text: "강렬하고 아티스틱한 퍼포먼스", score: 1 },
+                { text: "트렌디하고 캐치한 중독성 팝", score: 2 }
+            ]
+        },
+        {
+            q: "내가 입덕하는 순간은?",
+            options: [
+                { text: "자체 콘텐츠/라이브 속 티키타카와 장난끼", score: 0 },
+                { text: "무대 직캠 보고 입덕하는 갭모에", score: 1 },
+                { text: "SNS 사복 패션과 인스타 감성", score: 2 }
+            ]
+        },
+        {
+            q: "내가 제일 선호하는 최애 비주얼상/무드는?",
+            options: [
+                { text: "무심한 듯 귀여운 고양이/사막여우상", score: 0 },
+                { text: "뚜렷하고 완성도 높은 조각 미남/미녀상", score: 1 },
+                { text: "동글동글 보기만 해도 힐링되는 강아지상", score: 2 }
+            ]
+        }
+    ];
+
+    let currentCategory = '';
+    let currentQ = 0;
+    let totalScore = 0;
+
+    function selectCategory(cat) {
+        currentCategory = cat;
+        document.getElementById('screen-start').classList.add('hidden');
+        document.getElementById('screen-quiz').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const qData = questions[currentQ];
+        document.getElementById('question-text').innerText = qData.q;
+        
+        // 프로그레스 바 업데이트
+        const percent = ((currentQ + 1) / questions.length) * 100;
+        document.getElementById('progress').style.width = percent + '%';
+
+        const answersDiv = document.getElementById('answers');
+        answersDiv.innerHTML = '';
+        
+        qData.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.innerText = opt.text;
+            btn.onclick = () => selectAnswer(opt.score);
+            answersDiv.appendChild(btn);
+        });
+    }
+
+    function selectAnswer(score) {
+        totalScore += score;
+        currentQ++;
+        if (currentQ < questions.length) {
+            showQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    function showResult() {
+        document.getElementById('screen-quiz').classList.add('hidden');
+        document.getElementById('screen-result').classList.remove('hidden');
+
+        // 점수에 따라 아이돌 리스트 중 1명 매칭
+        const list = idolData[currentCategory];
+        const resultIndex = totalScore % list.length;
+        const result = list[resultIndex];
+
+        document.getElementById('res-badge').innerText = result.tag;
+        document.getElementById('res-name').innerText = result.name;
+        document.getElementById('res-desc').innerText = result.desc;
+    }
+
+    function resetTest() {
+        currentQ = 0;
+        totalScore = 0;
+        document.getElementById('screen-result').classList.add('hidden');
+        document.getElementById('screen-start').classList.remove('hidden');
+    }
+
+    function copyLink() {
+        navigator.clipboard.writeText(window.location.href);
+        alert("테스트 링크가 복사되었습니다! SNS나 친구에게 공유해 보세요. ✨");
+    }
+</script>
+</body>
+</html>
