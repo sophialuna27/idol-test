@@ -95,7 +95,6 @@
 </div>
 
 <script>
-    // ⚠️ 따옴표("") 안에 복사한 API Key를 직접 넣어주세요!
     const GEMINI_API_KEY = "AQ.Ab8RN6L2IpEkcRsb4dMD19_0bv9ZlrNJED8cjmj717fbBBhrCw";
 
     const questions = [
@@ -158,58 +157,4 @@
         answersDiv.innerHTML = '';
 
         if (qData.type === "choice") {
-            qData.options.forEach(optText => {
-                const btn = document.createElement('button');
-                btn.innerText = optText;
-                btn.onclick = () => selectAnswer(optText);
-                answersDiv.appendChild(btn);
-            });
-        } else if (qData.type === "text") {
-            const input = document.createElement('input');
-            input.type = "text";
-            input.id = "prev-idol-input";
-            input.placeholder = qData.placeholder;
-
-            const nextBtn = document.createElement('button');
-            nextBtn.innerText = "다음 질문으로 ➔";
-            nextBtn.onclick = () => {
-                const val = input.value.trim() || "특별히 없음";
-                selectAnswer(val);
-            };
-
-            answersDiv.appendChild(input);
-            answersDiv.appendChild(nextBtn);
-        }
-    }
-
-    function selectAnswer(answerText) {
-        selectedUserAnswers.push(`${questions[currentQ].q} => ${answerText}`);
-        currentQ++;
-        if (currentQ < questions.length) {
-            showQuestion();
-        } else {
-            getAiRecommendation();
-        }
-    }
-
-    async function getAiRecommendation() {
-        document.getElementById('screen-quiz').classList.add('hidden');
-        document.getElementById('screen-loading').classList.remove('hidden');
-
-        const prompt = `
-당신은 K-POP 4세대 및 5세대 아이돌 데이터와 덕질 문화에 정통한 전문가입니다.
-사용자가 제출한 다음 취향 정보와 [이전 최애]를 분석하여, **반드시 4세대 또는 5세대 한국 K-POP ${currentCategory} 아이돌 멤버 1명**을 추천해 주세요.
-
-[사용자 입력 정보]
-- 추천 대상 카테고리: ${currentCategory} 아이돌
-${selectedUserAnswers.join('\n')}
-
-[추천 핵심 지침]
-1. 사용자가 적은 '이전 최애'의 외모, 이미지, 분위기와 유사한 무드를 가진 4세대/5세대 ${currentCategory} 아이돌을 고려할 것.
-2. 얼굴상, 국적 취향, 소통 스타일 조건에 최대한 부합할 것.
-3. 설명문은 트렌디하고 친근한 톤(덕후 감성, "너랑 찰떡임!")으로 작성할 것.
-
-반드시 아래 JSON 형식으로만 답변하고, 다른 텍스트나 마크다운(\`\`\`json)은 절대 넣지 마세요.
-
-{
-  "group": "세대 및 그룹명 (예: 5세대 · 보이넥스트도어)",
+            qData.options.forEach(
